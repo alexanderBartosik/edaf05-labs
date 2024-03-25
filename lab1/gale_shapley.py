@@ -1,7 +1,7 @@
 import sys
 
 
-def gs(student_prefs, company_prefs):
+def gs(company_prefs, student_prefs):
     return 0
 
 
@@ -24,19 +24,20 @@ def parse():
     for line in sys.stdin:
         line_to_dict(line, c_prefs, s_prefs)
 
-    #TODO följa hinten och sortera company prefs! slide 26 F01
+    #TODO: c_prefs pref to index sort
 
     return c_prefs, s_prefs, N
 
 
-def pref_to_index(prefs): #funkar bara utan repetitioner och om samtliga tal från min till max förekommer
+#Ska användas för att sortera company prefs enligt hint på slide 26 F01
+#funkar bara utan repetitioner och om samtliga tal från min till max förekommer
+def pref_to_index(prefs): 
+    
     index_based_list = [0] * len(prefs)
     for i, pref in enumerate(prefs):
         index_based_list[pref - 1] = i + 1
 
     return index_based_list
-
-
 
 
 def main():
