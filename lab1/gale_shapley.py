@@ -1,8 +1,41 @@
 import sys
 
+def gs(c_prefs, s_prefs):
 
-def gs(company_prefs, student_prefs):
-    return 0
+    p = list(s_prefs.keys())
+    matches = {}
+    applied = {student: [] for student in s_prefs}
+    
+    while p:
+        # Take the first student from p
+        s = p.pop(0)
+        # Find the next preferred company that hasn't been applied to yet
+        for c in s_prefs[s]:
+            if c not in applied[s]:
+                applied[s].append(c)
+                break
+        else:
+            # If all companies have been applied to, skip further processing
+            continue
+
+        if c not in matches:
+            # If the company has no student, match it with s
+            matches[c] = s
+
+        elif c_prefs[c].index(s) < c_prefs[c].index(matches[c]):
+            # If the company prefers s over its current student
+            sc = matches[c]
+            matches[c] = s
+            # Add the displaced student back to p
+            if sc not in p:
+                p.append(sc)
+        else:
+            # If the company prefers its current student over s
+            # Add s back to p to try the next preferred company in the next round
+            if s not in p:
+                p.append(s)
+
+    return matches
 
 
 def line_to_dict(line, c_prefs, s_prefs):
@@ -39,20 +72,28 @@ def pref_to_index(prefs):
 
     return index_based_list
 
+#resultat från gs-algoritmen, dictionary med företag (nyckel) - studentpar.
+def output(r_dic):
+    r_sorted = dict(sorted(r_dic.items()))
+
+    for c in r_sorted:
+        print(r_sorted[c])
+
+
 
 def main():
     #parsea fil, dela upp i student och company prefs (dictionaries {s:[c,...],s...}, {c:[s,...],c...})
     c_prefs, s_prefs, N = parse()
-    print(c_prefs)
-    print(s_prefs)
-    print(N)
+    #print(c_prefs)
+    #print(s_prefs)
+    #print(N)
 
 
-    prefs = pref_to_index([4,2,1,3])
-    print("PREFS", prefs)
+    #prefs = pref_to_index([4,2,1,3])
+    #print("PREFS", prefs)
 
     result = gs(c_prefs, s_prefs)
-    #print(result)
+    output(result)
 
 
 if __name__ == "__main__":
