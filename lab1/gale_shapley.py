@@ -63,19 +63,21 @@ def pref_to_index(prefs):
 
     return index_based_list
 
+#resultat från gs-algoritmen, dictionary med företag (nyckel) - studentpar.
+def output(r_dic):
+    r_sorted = dict(sorted(r_dic.items()))
+
+    for c in r_sorted:
+        print(r_sorted[c])
+
+
 
 def main():
-    #parsea fil, dela upp i a och b prefs (dictionaries {s:[c,...],s...}, {c:[s,...],c...})
+    #parsea fil, dela upp i student och company prefs (dictionaries {s:[c,...],s...}, {c:[s,...],c...})
     c_prefs, s_prefs, N = parse()
-    print(c_prefs)
-    print(s_prefs)
-    print(N)
-
-    prefs = pref_to_index([4,2,1,3])
-    print("PREFS", prefs)
-
     result = gale_shapley(s_prefs, c_prefs)
-    print("GS Result: ", result)
+    output(result)
+
 
 if __name__ == "__main__":
     main()

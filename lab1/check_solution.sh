@@ -13,6 +13,9 @@ for f in data/**/*.in; do
     $* < $f > $out
     echo 'Checking...'
     python3 output_validator/output_validator.py $f < $out > $verdict
+    echo 'Out: '
+    echo '===================='
+    cat $out
     if grep -Fxq "success" $verdict
     then 
         echo Correct!
