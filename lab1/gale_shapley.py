@@ -5,35 +5,27 @@ Gale-Shapley algorithm solving the stable matching problem
 a_pref - proposing entities preferences list ("students"), 
 b_pref - receiving entities preferences list ("companies")
 '''
-def gale_shapley(b_pref, a_pref):
+def gale_shapley(a_pref, b_pref):
     b_matches = {}
     a_matches = {}
-
-    # while there are unassigned b's
-    while len(b_pref) > 0:
-        b, preferences = b_pref.popitem()
-        a = preferences.pop(0)
-
-        # if a is not matched, match a and b
-        if a not in a_matches:
-            a_matches[a] = b
-            b_matches[b] = a
-        # if a is matched, check if a prefers b over current match
-        else:
-            current_b = a_matches[a]
-            current_b_preferences = a_pref[current_b]
-            # if a prefers b over current match, match a and b and unmatch current match
-            if current_b_preferences.index(b) < current_b_preferences.index(current_b):
-                b_pref[b] = preferences
-            # if a does not prefer b over current match, add a back to b's preferences
-            else:
-                b_pref[current_b] = current_b_preferences[1:]
-                b_matches[b] = a
+    a_free = list(a_pref.keys())
+    # While there are free a's
+    while a_free:
+        a = a_free.pop(0)
+        b = a_pref[a].pop(0)
+        # If b is free, match a and b
+        if b in b_matches:
+            a2 = b_matches[b]
+            # If a prefers b over a2, match a and b and free a2
+            if b_pref[b].index(a) < b_pref[b].index(a2):
                 a_matches[a] = b
-
-    # return the stable matches
-    return b_matches
-    
+                a_free.append(a2)
+            else:
+                a_free.append(a)
+        else:
+            b_matches[b] = a
+            a_matches[a] = b
+    return a_matches
 
 
 def line_to_dict(line, c_prefs, s_prefs):
@@ -82,7 +74,7 @@ def main():
     prefs = pref_to_index([4,2,1,3])
     print("PREFS", prefs)
 
-    result = gale_shapley(c_prefs, s_prefs)
+    result = gale_shapley(s_prefs, c_prefs)
     print("GS Result: ", result)
 
 if __name__ == "__main__":
