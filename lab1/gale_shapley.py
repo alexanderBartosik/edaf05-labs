@@ -37,25 +37,7 @@ def gs(c_prefs, s_prefs):
                 # re-add the current student to p to reconsider their options
                 p.append(s)
 
-    return matches
-
-def line_to_dict(line, c_prefs, s_prefs):
-    parts = line.strip().split()
-    ints = [int(x) for x in parts]
-    key = ints[0]
-    values = []
-    if len(ints) > 1: #skippa tomma preflistor
-        values = ints[1:]
-    else:
-       return
-
-    if not key in c_prefs: #första förekomsten är company
-        c_prefs[key] = values
-    elif not key in s_prefs: #andra förekomsten är student
-        s_prefs[key] = values
-    elif key in c_prefs and key in s_prefs: #tredje förekomsten ska inte ske, skippa
-        return
-        
+    return matches        
 
 def parse():
     c_prefs = {}
@@ -63,7 +45,6 @@ def parse():
     first_line = sys.stdin.readline()
     N = int(first_line)
 
-    counter = 0
     ints = []
 
     for line in sys.stdin:
@@ -100,20 +81,18 @@ def output(r_dic):
     for c in r_sorted:
         print(r_sorted[c])
 
-
 def main():
     #parsea fil, dela upp i student och company prefs (dictionaries {s:[c,...],s...}, {c:[s,...],c...})
     c_prefs, s_prefs, N = parse()
-    print("N: ", N)
-    print("c_prefs: ", c_prefs)
-    print("s_prefs: ", s_prefs)
+    #print("N: ", N)
+    #print("c_prefs: ", c_prefs)
+    #print("s_prefs: ", s_prefs)
 
     #prefs = pref_to_index([4,2,1,3])
     #print("PREFS", prefs)
 
     result = gs(c_prefs, s_prefs)
     output(result)
-
 
 if __name__ == "__main__":
     main()
