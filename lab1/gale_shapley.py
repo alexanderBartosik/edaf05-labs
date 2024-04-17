@@ -39,7 +39,6 @@ def gs(c_prefs, s_prefs):
 
     return matches
 
-
 def line_to_dict(line, c_prefs, s_prefs):
     parts = line.strip().split()
     ints = [int(x) for x in parts]
@@ -64,11 +63,22 @@ def parse():
     first_line = sys.stdin.readline()
     N = int(first_line)
 
+    ints = []
+
     for line in sys.stdin:
-        line_to_dict(line, c_prefs, s_prefs)
-
-    #TODO: c_prefs pref to index sort
-
+        ints.append(int(x) for x in line.strip().split())
+    
+    for i in range(len(ints)):
+        j = i%(N+1)
+        
+        if j == 0:
+            key = ints[i]
+            preferences = ints[i+1:i+N]
+            if not key in c_prefs:
+                c_prefs[key] = preferences
+            elif not key in s_prefs:
+                s_prefs[key] = preferences
+            
     return c_prefs, s_prefs, N
 
 
