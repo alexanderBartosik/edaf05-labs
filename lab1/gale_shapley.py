@@ -63,17 +63,19 @@ def parse():
     first_line = sys.stdin.readline()
     N = int(first_line)
 
+    counter = 0
     ints = []
 
     for line in sys.stdin:
-        ints.append(int(x) for x in line.strip().split())
-    
+        line_of_ints = [int(x) for x in line.strip().split()]
+        ints.extend(line_of_ints)
+
     for i in range(len(ints)):
         j = i%(N+1)
         
         if j == 0:
             key = ints[i]
-            preferences = ints[i+1:i+N]
+            preferences = ints[i+1:i+N+1]
             if not key in c_prefs:
                 c_prefs[key] = preferences
             elif not key in s_prefs:
@@ -99,11 +101,13 @@ def output(r_dic):
         print(r_sorted[c])
 
 
-
 def main():
     #parsea fil, dela upp i student och company prefs (dictionaries {s:[c,...],s...}, {c:[s,...],c...})
     c_prefs, s_prefs, N = parse()
- 
+    print("N: ", N)
+    print("c_prefs: ", c_prefs)
+    print("s_prefs: ", s_prefs)
+
     #prefs = pref_to_index([4,2,1,3])
     #print("PREFS", prefs)
 
