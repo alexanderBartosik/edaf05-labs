@@ -1,4 +1,5 @@
 import sys
+import time
 
 def gs(c_prefs, s_prefs):
 
@@ -82,16 +83,15 @@ def output(r_dic):
         print(r_sorted[c])
 
 def main():
-    #parsea fil, dela upp i student och company prefs (dictionaries {s:[c,...],s...}, {c:[s,...],c...})
     c_prefs, s_prefs, N = parse()
-    #print("N: ", N)
-    #print("c_prefs: ", c_prefs)
-    #print("s_prefs: ", s_prefs)
-
-    #prefs = pref_to_index([4,2,1,3])
-    #print("PREFS", prefs)
-
+    start = time.time()
     result = gs(c_prefs, s_prefs)
+    stop = time.time()
+    
+    runtime = stop - start
+    with open('runtime.txt', 'a') as file:
+        file.write("N: " + str(N) + ", time: " + str(runtime) + '\n')
+
     output(result)
 
 if __name__ == "__main__":
