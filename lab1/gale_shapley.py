@@ -1,46 +1,36 @@
 import sys
 import time
-
+from collections import deque
 
 def gs(c_prefs, s_prefs):
-
-    p = list(s_prefs.keys())
+    p = deque(s_prefs.keys())
     matches = {}
-    applied = {student: [] for student in s_prefs}
+    idx = {student: 0 for student in s_prefs}
     
     while p:
         # Take the first student from p
-        s = p.pop(0)
-        # Find the next preferred company that hasn't been applied to yet
-        for c in s_prefs[s]:
-            if c not in applied[s]:
-                applied[s].append(c)
-                break
-        else:
-            # If all companies have been applied to, skip further processing
-            continue
+        s = p.popleft()
 
-        if c not in matches: #AAAAAAAAAAAAA
+        # Find the next preferred company that hasn't been applied to yet
+        clist = s_prefs[s]
+        c = clist[idx[s]]
+            
+        idx[s] = idx[s]+1 #increment for later
+
+        if c not in matches: 
             # If the company has no student, match it with s
             matches[c] = s
 
-        else:
-            # If the company already has a student, check the company's preference
-            current_student = matches[c]
-            # Check if s is in the company's preference list and compare preferences
-            if s in c_prefs[c] and (c_prefs[c].index(s) < c_prefs[c].index(current_student)): #linjärsökning som kan undvikas med pref-to-index
+        elif c_prefs[c][s-1] < c_prefs[c][matches[c]-1]: #PREF TO INDEX
                 # If the company prefers s over its current student
                 matches[c] = s
-                # Add the displaced student back to p
-                if current_student not in p:
-                    p.append(current_student)
-            elif current_student not in p:
+                p.append(matches[c])
+        else:
                 # If s is not in the preference list, or if the current student is preferred,
                 # re-add the current student to p to reconsider their options
                 p.append(s)
-
     return matches
-        
+
 
 def parse():
     c_prefs = {}
