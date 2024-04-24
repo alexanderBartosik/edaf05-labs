@@ -1,5 +1,6 @@
 import sys
 from collections import deque
+import time
 
 
 def parse():
@@ -35,7 +36,7 @@ def create_adjacency_list(words):
 
     last_four_counts = {word: get_letter_count(word,1) for word in words}
     all_counts = {word: get_letter_count(word,0) for word in words}
-    
+    edges = 0
 
     for u in words:
         for v in words:
@@ -43,32 +44,32 @@ def create_adjacency_list(words):
                 # Get letter counts for both words
                 u_count = last_four_counts[u]
                 v_count = all_counts[v]
-                # Check if all letters in u's last four are in v's last four in at least the same number
+                # Check if all letters in u's last four are in v in at least the same number
                 if all(v_count.get(letter, 0) >= count for letter, count in u_count.items()):
                     adjacency_list[u].append(v)
+                    edges += 1
 
-    return adjacency_list
 
+    return adjacency_list, edges
 
-from collections import deque
 
 def bfs(G, s, t):
-    #queue with the start node and a step count of 0
+    #dequeue with the start node and a step count of 0
     q = deque([(s, 0)])
     visited = set()
     visited.add(s)    
 
     while q:
-        v, steps = q.popleft() #first element from the queue with the current step count
+        v, steps = q.popleft() #first element from the queue with the current step count, O(1)
 
         if v == t: 
             return steps
 
         #go through each neighbor of the current node
-        for w in G[v]:
-            if w not in visited: #neighbor has not been visited yet
-                visited.add(w)
-                q.append((w, steps + 1)) #add to queue with, increment step count
+        for w in G[v]: #O(neighbors)
+            if w not in visited: #neighbor has not been visited yet, O(1)
+                visited.add(w) #O(1)
+                q.append((w, steps + 1)) #add to queue with, increment step count, O(1)
     
     #target not found
     return -1
@@ -87,12 +88,19 @@ def process_queries(queries, graph):
 def main():
     #print("===============START===============\n")
     wordlist, queries = parse()
+    nbr_nodes = len(wordlist)
     #print(wordlist, "\n", queries,"\n")
 
-    graph = create_adjacency_list(wordlist)
+    graph, nbr_edges = create_adjacency_list(wordlist)
     #print(graph)
 
+    start = time.time()
     process_queries(queries, graph)
+    end = time.time()
+    runtime = end-start
 
+    with open('time.txt', 'a') as file:
+        file.write(f'nodes+edges = {nbr_edges+nbr_nodes}.\tBFS runtime: {runtime}. \tRuntime/O(n+m): {runtime/(nbr_edges+nbr_edges)}\n')
+    
 if __name__ == "__main__":
     main()

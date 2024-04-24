@@ -1,0 +1,6 @@
+nodes+edges = 9.	BFS runtime: 0.0001552104949951172. 	Runtime/O(n+m): 1.940131187438965e-05
+nodes+edges = 38.	BFS runtime: 4.291534423828125e-05. 	Runtime/O(n+m): 7.663454328264509e-07
+nodes+edges = 4215.	BFS runtime: 0.05385088920593262. 	Runtime/O(n+m): 6.7907804799410615e-06
+nodes+edges = 259.	BFS runtime: 0.00049591064453125. 	Runtime/O(n+m): 2.7550591362847223e-05
+nodes+edges = 186554.	BFS runtime: 21.36521601676941. 	Runtime/O(n+m): 5.883983833121112e-05
+nodes+edges = 10334.	BFS runtime: 0.012435197830200195. 	Runtime/O(n+m): 1.1656540898200409e-06
