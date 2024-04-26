@@ -15,30 +15,30 @@ def gs(c_prefs, s_prefs):
     idx = {student: 0 for student in s_prefs}
 
     while p:
-        # Take the first student from p
+        #take the first student from p
         s = p.popleft()
-        # Find the next company student prefers most and has not applied to
+        #find the next company student prefers most and has not applied to
         clist = s_prefs[s]
         c = clist[idx[s]]
         idx[s] += 1
 
         if c not in matches: 
-            # If the company has no student, match it with s
+            #c has no student, match it with s
             matches[c] = s
         else:
-            # If the company already has a student, check the company's preference
+            #if c already has a student, check pref
             current_student = matches[c]
-            # Check if s is in the company's preference list and compare preferences
+            #check if s in the c prefs and compare
             if s in c_prefs[c] and (c_prefs[c][s-1] < c_prefs[c][current_student-1]):
-                # If the company prefers s over its current student
+                #if c prefers s over its current student
                 matches[c] = s
-                # Add the displaced student back to p
+                #add old (curr) s back to p
                 if current_student not in p:
                     p.append(current_student)
             elif current_student not in p:
-                # If s is not in the preference list, or if the current student is preferred,
-                # re-add the current student to p to reconsider their options
+                #if s rejected, add back to p
                 p.append(s)
+
     return matches        
 
 def parse():
