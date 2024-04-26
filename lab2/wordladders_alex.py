@@ -23,7 +23,8 @@ def parse():
 
 
 def create_adjacency_list(words):
-    adjacency_list = {word: [] for word in words}
+    adjacency_list = {word: [] for word in words} 
+    #array istället, indexera orden från 0 till antal ord. Samma tidskomp, men behöver inte hasha vilket går fortare
     
     def get_letter_count(word, start):
         count = {}
@@ -61,7 +62,6 @@ def bfs(G, s, t):
 
     while q:
         v, steps = q.popleft() #first element from the queue with the current step count, O(1)
-
         if v == t: 
             return steps
 
@@ -100,7 +100,7 @@ def main():
     runtime = end-start
 
     with open('time.txt', 'a') as file:
-        file.write(f'nodes+edges = {nbr_edges+nbr_nodes}.\tBFS runtime: {runtime}. \tRuntime/O(n+m): {runtime/(nbr_edges+nbr_edges)}\n')
+        file.write(f'nodes+edges = {nbr_edges+nbr_nodes}.\tBFS runtime: {runtime}. \tRuntime/O(n+m): {runtime/(nbr_edges+nbr_nodes)}\n')
     
 if __name__ == "__main__":
     main()

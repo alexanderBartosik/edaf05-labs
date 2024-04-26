@@ -67,7 +67,6 @@ def parse():
     return c_prefs, s_prefs, N
 
 #Ska användas för att sortera company prefs enligt hint på slide 26 F01
-#funkar bara utan repetitioner och om samtliga tal från min till max förekommer
 def pref_to_index_for_one_key(pref_list): 
     pref_list_copy = pref_list.copy()
     for i in range(len(pref_list)):
