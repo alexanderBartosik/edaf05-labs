@@ -30,10 +30,10 @@ def kruskal(num_nodes, num_edges, start_index, stop_index, weight):
     edges = sorted(zip(weight, start_index, stop_index))
 
     # Create a dictionary to store the parent of each node
-    parent = {i: i for i in range(num_nodes)}
+    parent = {i: i for i in range(1, num_nodes + 1)}
 
     # Create a dictionary to store the rank of each node
-    rank = {i: 0 for i in range(num_nodes)}
+    rank = {i: 0 for i in range(1, num_nodes + 1)}
 
     # Create a list to store the edges in the minimum spanning tree
     mst = []
