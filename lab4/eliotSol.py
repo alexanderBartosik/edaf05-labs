@@ -12,36 +12,37 @@ methods and sorting.
 
 # Parses the content of lab 4 input files
 def parse():
+    # Read first line (N), then the rest and form list of tuples (x, y)
     N, *points = [tuple(map(int, line.strip().split())) for line in sys.stdin]
     return N, points
 
 '''
 Divide and conquer algorithm that finds the closest pair of points in a set of points.
 
-Time complexity: O(n log n) according to the Master Theorem
+Time complexity: T(n) = 2T(n/2) + O(n) => O(n log n) according to the Master Theorem
 
-points - a list of tuples (x, y) representing the coordinates of the points
+points - a list of tuples (x, y) representing the coordinates of all the points
 '''
 def find_closest_pair(points):
 
     def distance(p1, p2):
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) # euclidean norm 2 coordinates
     
-    # closest_cross_pair is a helper function that finds the closest pair of points
+    # Closest pair of points in the strip
     def closest_cross_pair(strip, delta):
         strip.sort(key=lambda point: point[1])  # Sort strip by y-coordinate
-        min_dist = delta
         for i in range(len(strip)):
-            for j in range(i + 1, min(i + 8, len(strip))):
+            for j in range(i + 1, min(i + 4, len(strip))):
                 dist = distance(strip[i], strip[j])
-                if dist < min_dist:
-                    min_dist = dist
-        return min_dist
+                if dist < delta:
+                    delta = dist
+        return delta
 
     '''
     closest_recursive is a recursive function that finds the closest pair of points
     in a set of points.
     Divide into two sets, find the closest pair in each set, and then find the closest pair
+    Time complexity: T(n) = 2T(n/2) + O(n) => O(n log n) according to the Master Theorem
     '''
     def closest_recursive(points):
         # BOTTOM CASE: If there are only 3 or fewer points, calculate and return the closest pair
@@ -59,12 +60,15 @@ def find_closest_pair(points):
         dr = closest_recursive(right)
         d = min(dl, dr) # Find the minimum distance between the two sets
 
-        # Find the closest pair of points that are in different sets
+        # Find the closest pair of points in different left/right sets filtered by distance d
         strip = [p for p in points if abs(p[0] - mid_point[0]) < d]
         return min(d, closest_cross_pair(strip, d))
 
     # Converting coordinates to point list and initiating the process
-    points.sort(key=lambda point: point[0])  # Sort points by x-coordinate O(n log n)
+    '''
+    Sort points by x-coordinate O(n log n)
+    '''
+    points.sort(key=lambda point: point[0])  
     closest_distance = closest_recursive(points)
     return format(closest_distance, '.6f') # Return on desired format
 
@@ -73,6 +77,11 @@ def write_to_output_file(start, stop):
     with open('time.txt', 'a') as file:
         file.write("Runtime: " + str(runtime) + '\n')
 
+
+'''
+Overall time complexity is init sort and recursive divid and conquer: 
+O(n log n) + O(n log n) = O(n log n)
+'''
 def main():
     _, points = parse()
 
