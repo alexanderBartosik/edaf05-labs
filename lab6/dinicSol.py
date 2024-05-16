@@ -1,22 +1,21 @@
 import sys
 import time
-from collections import defaultdict, deque
-from copy import deepcopy
+from collections import deque, defaultdict
 
 def parse():
     # Extract the first line of the input file (4 entries in first line)
     first_line = sys.stdin.readline().strip().split()
-    N = int(first_line[0])  # num nodes
-    M = int(first_line[1])  # num edges
-    C = int(first_line[2])  # num students
-    P = int(first_line[3])  # num paths
+    N = int(first_line[0]) # num nodes
+    M = int(first_line[1]) # num edges
+    C = int(first_line[2]) # num students
+    P = int(first_line[3]) # num paths
 
     # Extract the rest of the lines
     all_lines_of_ints = []
     for line in sys.stdin:
         line_of_ints = [int(x) for x in line.strip().split()]
         all_lines_of_ints.append(line_of_ints)
-
+    
     # Extract paths/edges (start_idx, end_idx, max_flow)
     paths = [(all_lines_of_ints[i][0], all_lines_of_ints[i][1], all_lines_of_ints[i][2]) for i in range(M)]
     # Extract delete_idx (order of paths idx to delete)
@@ -28,15 +27,18 @@ class Dinic:
     def __init__(self, N):
         self.N = N
         self.adj = [[] for _ in range(N)]
-        self.capacity = defaultdict(lambda: defaultdict(int))
-        self.level = [0] * N
+        self.level = [-1] * N
         self.ptr = [0] * N
 
     def add_edge(self, u, v, cap):
-        if self.capacity[u][v] == 0 and self.capacity[v][u] == 0:
-            self.adj[u].append((v, len(self.adj[v])))
-            self.adj[v].append((u, len(self.adj[u]) - 1))
-        self.capacity[u][v] += cap
+        self.adj[u].append([v, len(self.adj[v]), cap])
+        self.adj[v].append([u, len(self.adj[u])-1, 0])
+
+    def reset_graph(self, paths):
+        self.adj = [[] for _ in range(self.N)]
+        for u, v, c in paths:
+            self.add_edge(u, v, c)
+            self.add_edge(v, u, c)
 
     def bfs(self, source, sink):
         self.level = [-1] * self.N
@@ -44,77 +46,61 @@ class Dinic:
         self.level[source] = 0
         while queue:
             u = queue.popleft()
-            for v, idx in self.adj[u]:
-                if self.level[v] == -1 and self.capacity[u][v] > 0:
+            for v, rev, cap in self.adj[u]:
+                if self.level[v] == -1 and cap > 0:
                     self.level[v] = self.level[u] + 1
                     queue.append(v)
-        return self.level[sink] != -1
+                    if v == sink:
+                        return True
+        return False
 
     def dfs(self, u, sink, flow):
         if u == sink:
             return flow
         while self.ptr[u] < len(self.adj[u]):
-            v, idx = self.adj[u][self.ptr[u]]
-            if self.level[v] == self.level[u] + 1 and self.capacity[u][v] > 0:
-                pushed = self.dfs(v, sink, min(flow, self.capacity[u][v]))
+            v, rev, cap = self.adj[u][self.ptr[u]]
+            if self.level[v] == self.level[u] + 1 and cap > 0:
+                pushed = self.dfs(v, sink, min(flow, cap))
                 if pushed:
-                    self.capacity[u][v] -= pushed
-                    self.capacity[v][u] += pushed
+                    self.adj[u][self.ptr[u]][2] -= pushed
+                    self.adj[v][rev][2] += pushed
                     return pushed
             self.ptr[u] += 1
         return 0
 
     def max_flow(self, source, sink):
-        flow = 0
+        total_flow = 0
         while self.bfs(source, sink):
             self.ptr = [0] * self.N
-            while True:
-                pushed = self.dfs(source, sink, float('Inf'))
-                if pushed == 0:
-                    break
-                flow += pushed
-        return flow
-
-    def reset_state(self):
-        self.level = [0] * self.N
-        self.ptr = [0] * self.N
+            flow = self.dfs(source, sink, float('Inf'))
+            while flow:
+                total_flow += flow
+                flow = self.dfs(source, sink, float('Inf'))
+        return total_flow
 
 def network_flow_deletion(N, C, paths, delete_idx):
     source = 0
     sink = N - 1
-    original_capacity = defaultdict(lambda: defaultdict(int))
-    
-    for u, v, c in paths:
-        original_capacity[u][v] += c
 
-    initial_dinic = Dinic(N)
-    for u, v, c in paths:
-        initial_dinic.add_edge(u, v, c)
-    
-    initial_max_flow = initial_dinic.max_flow(source, sink)
+    dinic = Dinic(N)
+    dinic.reset_graph(paths)
+
+    initial_max_flow = dinic.max_flow(source, sink)
     if initial_max_flow < C:
         return 0, initial_max_flow
 
     deletions = 0
-    current_capacity = deepcopy(original_capacity)
-
     for idx in delete_idx:
         u, v, c = paths[idx]
-        current_capacity[u][v] -= c
-
-        dinic = Dinic(N)
-        for i in range(N):
-            for j in range(N):
-                if current_capacity[i][j] > 0:
-                    dinic.add_edge(i, j, current_capacity[i][j])
-
-        current_max_flow = dinic.max_flow(source, sink)
-        if current_max_flow >= C:
+        paths[idx] = (u, v, 0)  # effectively remove the edge
+        dinic.reset_graph(paths)
+        if dinic.max_flow(source, sink) >= C:
             deletions += 1
         else:
-            current_capacity[u][v] += c
+            paths[idx] = (u, v, c)  # revert the edge removal
             break
 
+    dinic.reset_graph(paths)
     final_max_flow = dinic.max_flow(source, sink)
     return deletions, final_max_flow
 
@@ -132,7 +118,7 @@ def main():
 
     write_to_output_file(start, stop)
 
-    # final output
+    #final output
     print(deletions, final_flow)
     
 if __name__ == "__main__": 
