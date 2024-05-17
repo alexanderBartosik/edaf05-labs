@@ -26,7 +26,12 @@ def parse():
 # Kruskals algorithm for finding the minimum spanning tree (MST) of a graph
 # Returns the MST as a list of edges
 def kruskal(num_nodes, num_edges, start_index, stop_index, weight):
-    # Sort the edges by weight
+    
+    '''
+    Sort the edges by weight in increasing order O(E log E) = O(E log M) 
+    '''
+    
+    # Sort edges by weight
     edges = sorted(zip(weight, start_index, stop_index))
 
     # Create a dictionary to store the parent of each node
@@ -38,16 +43,30 @@ def kruskal(num_nodes, num_edges, start_index, stop_index, weight):
     # Create a list to store the edges in the minimum spanning tree
     mst = []
 
-    # Define a function to find the parent of a node
-    def find(node):
-        if parent[node] != node:
-            parent[node] = find(parent[node])
-        return parent[node]
+    '''
+    Union-find data structure with path compression and union by rank. 
+    Time complexity O(E α(M)) where α(M) is the inverse Ackermann function.
+    '''
 
-    # Define a function to union two sets
+    # Find the root of a set. Compress the path while finding the root.
+    def find(v):
+        p = v
+        
+        # Find root. The root is saved in p
+        while parent[p] != p:
+            p = parent[p]
+        
+        # Compress. Set the parent of all nodes in the path to the root
+        while parent[v] != v:
+            w = parent[v]
+            parent[v] = p
+            v = w
+        return p
+
+    # Union two sets/trees by rank
     def union(node1, node2):
-        root1 = find(node1)
-        root2 = find(node2)
+        root1 = parent[node1]   # used find before but it is not necessary
+        root2 = parent[node2]
         if root1 != root2:
             if rank[root1] > rank[root2]:
                 parent[root2] = root1
@@ -63,6 +82,9 @@ def kruskal(num_nodes, num_edges, start_index, stop_index, weight):
             mst.append((u, v, w))
             union(u, v)
 
+    '''
+    Equivalent time complexity is O(E log M) + O(E α(M)) = O(E log M)
+    '''
     return mst
 
 def write_to_output_file(start, stop):
@@ -79,10 +101,8 @@ def main():
     
     write_to_output_file(start, stop)
     
-    # Print final result
-    total_weight = sum([w for u, v, w in mst])
+    total_weight = sum([w for _, _, w in mst])
     print(total_weight)
-
 
 if __name__ == '__main__':
     main()

@@ -58,8 +58,8 @@ def find_closest_pair(points_x_sort, points_y_sort):
 
         # Pick out the points that are in the left and right set from the y-sorted list. 
         # If the x-coordinates are equal, sort by y-coordinate
-        left_y  = list(filter(lambda point: point[0] < midpoint_x or (point[0] == midpoint_x and point[1] <= mid_point[1]), points_y_sort))
-        right_y = list(filter(lambda point: point[0] > midpoint_x or (point[0] == midpoint_x and point[1] > mid_point[1]), points_y_sort))
+        left_y  = list(filter(lambda point: point <= mid_point, points_y_sort))
+        right_y = list(filter(lambda point: point > mid_point, points_y_sort))
 
         # Recursively find the closest pair of points in each set
         dl = closest_recursive(left_x, left_y)
@@ -91,7 +91,7 @@ def main():
     '''
     Sort points by x-and y-coordinate O(n log n) + O(n log n) = O(n log n)
     '''
-    points_x_sort = sorted(points, key=lambda point: point[0])
+    points_x_sort = sorted(points)
     points_y_sort = sorted(points, key=lambda point: point[1])
 
     start = time.time()
