@@ -28,7 +28,7 @@ def needleman_wunsch(seq1, seq2, letters, score_matrix, gap_penalty=-4):
     scores = [[0] * (m + 1) for _ in range(n + 1)]
     traceback = [[None] * (m + 1) for _ in range(n + 1)]
 
-    #initialize the first row and column. "BASE CASE" (scores for aligning with gap in beginning)
+    #initialize the first row and column. (scores for aligning with gap in beginning)
     for i in range(1, n + 1):
         scores[i][0] = i * gap_penalty
         traceback[i][0] = 'UP'
