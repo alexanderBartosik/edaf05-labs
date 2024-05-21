@@ -3,22 +3,18 @@ import time
 from collections import deque, defaultdict
 
 def parse():
-    # Extract the first line of the input file (4 entries in first line)
     first_line = sys.stdin.readline().strip().split()
-    N = int(first_line[0]) # num nodes
-    M = int(first_line[1]) # num edges
-    C = int(first_line[2]) # num students
-    P = int(first_line[3]) # num paths
+    N = int(first_line[0])
+    M = int(first_line[1])
+    C = int(first_line[2])
+    P = int(first_line[3])
 
-    # Extract the rest of the lines
     all_lines_of_ints = []
     for line in sys.stdin:
         line_of_ints = [int(x) for x in line.strip().split()]
         all_lines_of_ints.append(line_of_ints)
     
-    # Extract paths/edges (start_idx, end_idx, max_flow)
     paths = [(all_lines_of_ints[i][0], all_lines_of_ints[i][1], all_lines_of_ints[i][2]) for i in range(M)]
-    # Extract delete_idx (order of paths idx to delete)
     delete_idx = [line[0] for line in all_lines_of_ints[M:]]
 
     return N, M, C, P, paths, delete_idx
@@ -89,16 +85,26 @@ def network_flow_deletion(N, C, paths, delete_idx):
     if initial_max_flow < C:
         return 0, initial_max_flow
 
-    deletions = 0
-    for idx in delete_idx:
-        u, v, c = paths[idx]
-        paths[idx] = (u, v, 0)  # effectively remove the edge
-        dinic.reset_graph(paths)
+    left, right = 0, len(delete_idx)
+    while left < right:
+        mid = (left + right) // 2
+        temp_paths = paths[:]
+        for i in range(mid + 1):
+            idx = delete_idx[i]
+            u, v, c = paths[idx]
+            temp_paths[idx] = (u, v, 0)
+        
+        dinic.reset_graph(temp_paths)
         if dinic.max_flow(source, sink) >= C:
-            deletions += 1
+            left = mid + 1
         else:
-            paths[idx] = (u, v, c)  # revert the edge removal
-            break
+            right = mid
+
+    deletions = left
+    for i in range(left):
+        idx = delete_idx[i]
+        u, v, c = paths[idx]
+        paths[idx] = (u, v, 0)
 
     dinic.reset_graph(paths)
     final_max_flow = dinic.max_flow(source, sink)
@@ -118,7 +124,6 @@ def main():
 
     write_to_output_file(start, stop)
 
-    #final output
     print(deletions, final_flow)
     
 if __name__ == "__main__": 
