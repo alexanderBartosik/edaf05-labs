@@ -23,7 +23,7 @@ def testParsed(N, M, C, P, paths, delete_idx):
 class FlowNetwork:
     def __init__(self, n):
         self.n = n
-        self.capacity = defaultdict(lambda: defaultdict(int))
+        self.capacity = defaultdict(lambda: defaultdict(int)) # dict that creates a new dict if key not found
         self.flow = defaultdict(lambda: defaultdict(int))
         self.height = [0] * n
         self.excess = [0] * n
@@ -31,7 +31,7 @@ class FlowNetwork:
 
     def add_edge(self, u, v, capacity):
         self.capacity[u][v] = capacity
-        self.capacity[v][u] = capacity
+        self.capacity[v][u] = capacity  # undirected graph
         self.adj[u].append(v)
         self.adj[v].append(u)
 

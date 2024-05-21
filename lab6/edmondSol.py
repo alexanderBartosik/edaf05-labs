@@ -2,21 +2,16 @@ import sys
 import time
 from collections import deque
 
-'''
-Extract the input files of lab 6
-
-returns: 
-N, M, C, P  - ints
-paths       - list of tuples (start_idx, end_idx, max_flow)
-delete_idx  - list of ints order of paths idx to delete
-'''
 def parse():
+    #print("Starting parse")
     # Extract the first line of the input file (4 entries in first line)
     first_line = sys.stdin.readline().strip().split()
     N = int(first_line[0]) # num nodes
     M = int(first_line[1]) # num edges
     C = int(first_line[2]) # num students
     P = int(first_line[3]) # num paths
+
+    #print(f"Parsed first line: N={N}, M={M}, C={C}, P={P}")
 
     # Extract the rest of the lines
     all_lines_of_ints = []
@@ -29,13 +24,13 @@ def parse():
     # Extract delete_idx (order of paths idx to delete)
     delete_idx = [line[0] for line in all_lines_of_ints[M:]]
 
+    #print("Finished parsing")
     return N, M, C, P, paths, delete_idx
 
 def bfs(capacity, source, sink, parent):
     visited = [False] * len(capacity)
     queue = deque([source])
     visited[source] = True
-
     while queue:
         u = queue.popleft()
 
@@ -84,27 +79,35 @@ def network_flow_deletion(N, C, paths, delete_idx):
     if initial_max_flow < C:
         return 0, initial_max_flow
 
-    deletions = 0
-    for idx in delete_idx:
-        u, v, c = paths[idx]
-        capacity[u][v] -= c
-        capacity[v][u] -= c
+    low, high = 0, len(delete_idx)
+    last_valid_max_flow = initial_max_flow
+    last_deletions = 0
 
-        if edmonds_karp(N, source, sink, [row[:] for row in capacity]) >= C:
-            deletions += 1
+    while low <= high:
+        mid = (low + high) // 2
+
+        temp_capacity = [row[:] for row in capacity]
+        for idx in delete_idx[:mid]:
+            u, v, c = paths[idx]
+            temp_capacity[u][v] -= c
+            temp_capacity[v][u] -= c
+
+        current_max_flow = edmonds_karp(N, source, sink, temp_capacity)
+
+        if current_max_flow >= C:
+            last_valid_max_flow = current_max_flow
+            last_deletions = mid
+            low = mid + 1
         else:
-            capacity[u][v] += c
-            capacity[v][u] += c
-            break
+            high = mid - 1
 
-    final_max_flow = edmonds_karp(N, source, sink, [row[:] for row in capacity])
-    return deletions, final_max_flow
+    return last_deletions, last_valid_max_flow
 
 def write_to_output_file(start, stop):
     runtime = stop - start
     with open('time.txt', 'a') as file:
         file.write("Runtime: " + str(runtime) + '\n')
-
+    #print(f"Runtime written to file: {runtime}")
 
 def main():
     N, _, C, _, paths, delete_idx = parse()
